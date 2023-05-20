@@ -1,38 +1,13 @@
 # PROBITAN
 ## Description ##
 
-**hsh** is a simple UNIX command language interpreter that reads commands from either a file or standard input and executes them.
+**PROBITAN** is a software programme that is used to visualize equipment uptime and downtime events graphically. It accesses statistical records of downtime events for the equipment over a period of time and uses this data to present a picture of how each event contributes to the overall loses (PR loss) on the equipment over the period studied. 
 
-### How **hsh** works
-* Prints a prompt and waits for a command from the user
-* Creates a child process in which the command is checked
-* Checks for built-ins, aliases in the PATH, and local executable programs
-* The child process is replaced by the command, which accepts arguments
-* When the command is done, the program returns to the parent process and prints the prompt
-* The program is ready to receive a new command
-* To exit: press Ctrl-D or enter "exit" (with or without a status)
-* Works also in non interactive mode
-
-### Compilation
-
-`gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh`
-
-### Invocation
-
-Usage: **hsh** [filename]
-
-To invoke **hsh**, compile all `.c` files in the repository and run the resulting executable.
-
-**hsh** can be invoked both interactively and non-interactively. If **hsh** is invoked with standard input not connected to a terminal, it reads and executes received commands in order.
-
-Example:
-```
-$ echo "echo 'hello'" | ./hsh
-'hello'
-$
-```
-
-If **hsh** is invoked with standard input connected to a terminal (determined by [isatty](https://linux.die.net/man/3/isatty)(3)), an *interactive* shell is opened. When executing interactively, **hsh** displays the prompt `$ ` when it is ready to read a command.
+### How **PROBITAN** works
+* It accepts a project file as an input to be studied. This could be an existing file within the applications directories or a new file input
+* It allows the user to create visual graphs based on the data contained in the project file 
+* It allows the user to upload a second file to compare with the previous one
+* When a second project file is present, user can generate comparative graphs of data between the two files
 
 Example:
 ```
