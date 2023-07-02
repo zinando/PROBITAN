@@ -1,0 +1,9 @@
+"""
+    This contains functions for specific tasks
+"""
+from tkinter.messagebox import showinfo
+
+
+
+def display_msg():
+    showinfo("Alert!", f"I am a message button.")

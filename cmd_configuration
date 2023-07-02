@@ -1,0 +1,4 @@
+#activate virtual environment on windows
+cd OneDrive/Desktop/PROBITAN/
+virtual\Scripts\activate
+python probitan.py 
