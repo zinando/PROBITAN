@@ -3,6 +3,7 @@ from tkinter import *
 import customtkinter as ctk
 from myapp.helpers import myfunc as func
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import matplotlib.pyplot as plt
 
 
 class WinView(ctk.CTk):
@@ -29,12 +30,12 @@ class WinView(ctk.CTk):
         self.w, self.h = w, h
         position_x = (self.winfo_screenwidth() // 2) - (w // 2)
         position_y = (self.winfo_screenheight() // 2) - (h // 2)
-        self.geometry("{}x{}+{}+{}".format(w, h, position_x, position_y))
+        self.geometry("{}x{}+{}+{}".format(w, h, position_x * 2, position_y))
         self.title('PROBITAN - An Equipment Process Reliability Analytical Tool.')
+        self.iconbitmap('myapp/appfiles/images/bg/icon.ico')
         func.make_dynamic(self)
         self.top_level_window = None
         self.resizable(False, False)
-        # func.display_msg(str(self.winfo_width()))
 
     def base_view(self):
         """ creates the project entry view """
@@ -172,9 +173,9 @@ class WinView(ctk.CTk):
     def select_result_file(self):
         """This will trigger file selection from program directory"""
 
-        projectname, projectfile = func.select_file("myapp/documents/after/", 2)
+        projectname, project_file = func.select_file("myapp/documents/after/", 2)
         if projectname == self.projectname:
-            self.process_project_file(2)
+            self.process_project_file(2, project_file)
             self.top_level_window.destroy()
         else:
             func.display_msg("Selected file does not match the before project file!")
@@ -276,11 +277,11 @@ class WinView(ctk.CTk):
                 return
         func.display_msg("No events to display.")
 
-    def display_graph(self, fig, compare_command=None, expand_command=None):
+    def display_graph(self, fig, compare_command=None, expand_command=None, legend_obj=None):
         if self.current_display:
             self.current_display.destroy()
         if expand_command is None:
-            expand_command = self.current_plot.show
+            expand_command = self.show_current_plot  # self.current_plot.show
 
         # create a bg label to hold the graph
         x = 0
@@ -291,9 +292,19 @@ class WinView(ctk.CTk):
         self.current_display = bg_label
 
         def exit_command():
-            self.current_display=None
+            self.current_display = None
             bg_label.destroy()
             return
+
+        def toggle_legend(obj):
+            """removes the legend from the plot and replots the graph"""
+            if legend_obj:
+                legend_obj.set_visible(not legend_obj.get_visible())
+                plt.draw()
+                fig = plt.gcf()
+                self.display_graph(fig, compare_command, expand_command, legend_obj)
+            return
+
 
         # create the label to hold the graph
         x = 0
@@ -305,7 +316,8 @@ class WinView(ctk.CTk):
         # create a label and action buttons
         y = y + int(bg_lab.cget('height'))
         h = 30
-        action_label = self.create_label(window=bg_label, fg_color="#ffffff", bg_color='#ffffff', x=x, y=y, height=h, width=w)
+        action_label = self.create_label(window=bg_label, fg_color="#ffffff", bg_color='#ffffff', x=x, y=y, height=h,
+                                         width=w)
 
         # create buttons inside the action label
         w = 100
@@ -321,8 +333,15 @@ class WinView(ctk.CTk):
         compare_btn = self.create_button(window=action_label, text='compare', bg_color='#ffffff', fg_color="#495068",
                                          text_color="#FFFADA", x=x, y=y, corner_radius=8, height=h, width=w,
                                          command=compare_command)
-        # exit btn
+        # hide legend btn
         x = x + compare_btn.cget("width") + 20
+        legend_btn = self.create_button(window=action_label, text='toggle legend', bg_color='#ffffff',
+                                        fg_color="#495068", text_color="#FFFADA", x=x, y=y, corner_radius=8,
+                                        height=h, width=w)
+        legend_btn.configure(command=lambda: toggle_legend(legend_btn))
+
+        # exit btn
+        x = x + legend_btn.cget("width") + 20
         exit_btn = self.create_button(window=action_label, text='exit', bg_color='#ffffff', fg_color="#495068",
                                       text_color="#FFFADA", x=x, y=y, corner_radius=8, height=h, width=50,
                                       command=exit_command)
@@ -333,6 +352,21 @@ class WinView(ctk.CTk):
         canvas.draw()
         canvas.get_tk_widget().place(x=0, y=0)
 
+
+    def show_current_plot(self):
+        """shows the current plot outside the app"""
+        # Modify dpi and figsize just before plt.show()
+        new_dpi = 150
+        new_figsize = (18, 8)
+
+        # Set the desired dpi and figsize for the current figure
+        self.current_plot.gcf().set_dpi(new_dpi)
+        self.current_plot.gcf().set_size_inches(new_figsize)
+
+        # Display the modified plot
+        self.current_plot.show()
+
+        return
 
 
 class TopLevel(ctk.CTkToplevel):

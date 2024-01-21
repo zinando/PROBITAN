@@ -4,6 +4,7 @@ import shutil
 import csv
 from myapp.helpers import myfunc as func
 from datetime import datetime
+import openpyxl
 
 
 class FILEHANDLER:
@@ -25,8 +26,6 @@ class FILEHANDLER:
     def validate_file(self, filename):
         """ Check that file was selected """
         if filename is None or filename == '':
-            from myapp.helpers import myfunc
-            myfunc.display_msg("No file was selected. Please select a file.")
             return False
         else:
             return True
@@ -88,10 +87,8 @@ class FILEHANDLER:
         else:
             return (None, None)
 
-    def read_file(self, filepath):
+    def read_filexxx(self, filepath):
         """Reads a spreadsheet/csv file and returns a dictionary of its content"""
-
-        DictReader_obj = []
 
         with open(filepath) as f:
             DictReader_objx = csv.DictReader(f)
@@ -100,6 +97,39 @@ class FILEHANDLER:
         processed_data = self.fill_content(DictReader_obj)
 
         return processed_data
+
+    def read_file(self, filepath):
+        """Reads a spreadsheet/csv file and returns a dictionary of its content"""
+
+        try:
+            with open(filepath) as f:
+                DictReader_objx = csv.DictReader(f)
+                DictReader_obj = list(DictReader_objx)
+
+            processed_data = self.fill_content(DictReader_obj)
+            return processed_data
+
+        except Exception as csv_error:
+            try:
+                workbook = openpyxl.load_workbook(filepath)
+                sheet = workbook.active
+                headers = [cell.value for cell in sheet[1]]
+
+                data = []
+                for row in sheet.iter_rows(min_row=2, values_only=True):
+                    row_dict = dict(zip(headers, row))
+                    data.append(row_dict)
+
+                processed_data = self.fill_content(data)
+                return processed_data
+
+            except Exception as excel_error:
+                error = f"Error reading Excel file: {excel_error}"
+                func.display_msg(error)
+
+                # Delete the file if an error occurs
+                os.remove(filepath)
+                return None
 
     def get_month_by_number(self, month):
         """Accepts a month number and returns the name of the month"""

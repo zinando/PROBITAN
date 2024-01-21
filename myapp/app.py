@@ -63,13 +63,16 @@ class Probitan(WinView):
 
         self.process_project_file(1)
 
-    def process_project_file(self, folder_id):
+    def process_project_file(self, folder_id, file_to_process=None):
         """Processes project file after upload/selection"""
 
         if self.projectname is not None:
             # process the file data and display time span of events
             info = FILEHANDLER(folder_id)
-            full_file_path = "{}{}".format(info.file_path, self.projectfile)
+            if file_to_process is not None:
+                full_file_path = "{}{}".format(info.file_path, file_to_process)
+            else:
+                full_file_path = "{}{}".format(info.file_path, self.projectfile)
 
             # read the file content
             result1 = info.read_file(full_file_path)
@@ -99,22 +102,22 @@ class Probitan(WinView):
             text = "Analysing data from {} to {}.".format(first_value, last_value)
             self.instantiate_project(folder_id, self.projectname, self.projectfile, processed_data, event_types,
                                      planned_events, unplanned_events, cil_locations, date_format,
-                                     location_processed_data, monthly_events)
+                                     location_processed_data, monthly_events, list_items)
             self.create_work_view(text)
 
     def instantiate_project(self, folder_id, name, file, processed_data, event_types, planned_events, unplanned_events,
-                            cil_locations, date_format, location_processed_data, monthly_events):
+                            cil_locations, date_format, location_processed_data, monthly_events, month_list):
         """Creates instance of the PROJECT class"""
         if folder_id == 1:
             self.project_class_before = PROJECT(name, file, processed_data, event_types, planned_events,
                                                 unplanned_events, cil_locations, date_format, location_processed_data,
-                                                monthly_events)
+                                                monthly_events, month_list)
             self.active_class = self.project_class_before
             self.initialize_project_variables("activate project")
         elif folder_id == 2:
             self.project_class_after = PROJECT(name, file, processed_data, event_types, planned_events,
                                                unplanned_events, cil_locations, date_format, location_processed_data,
-                                               monthly_events)
+                                               monthly_events, month_list)
             self.active_class = self.project_class_after
             self.initialize_project_variables("activate project")
 
@@ -131,7 +134,7 @@ class Probitan(WinView):
         # labels
         bg_lab2 = self.create_label(text="", image=view_bg, height=self.h, width=self.w)
         footer = self.create_label(
-            text="This project is submitted to the department of Mechanical Engineering, University of Ife, Nigeria",
+            text="This project is submitted to the department of Mechanical Engineering, Obafemi Awolowo University, Ile Ife, Nigeria.",
             height=40, width=self.w, y=self.h - 40, fg_color="#495068", text_color="#fffada", bg_color="#495068",
             font_size=14, font_weight="bold")
         menu_bar = self.create_label(height=40, width=self.w, image=menu_bg)
@@ -429,8 +432,9 @@ class Probitan(WinView):
         plot = MYGRAPH()
         title = "Average Planned Downtime Per Month"
         self.close_plot()
-        fig, self.current_plot = plot.generate_average_monthly_dt_graph(self.processed_data, self.planned_events, title)
-        self.display_graph(fig, compare_command=lambda: self.compare_before_and_after_graphs('planned_events'))
+        fig, self.current_plot, legend_obj = plot.generate_average_monthly_dt_graph(self.processed_data, self.planned_events, title)
+        self.display_graph(fig, compare_command=lambda: self.compare_before_and_after_graphs('planned_events'),
+                           legend_obj=legend_obj)
 
     def plot_average_unplanned_downtime_events(self, project):
         """Plots the graph of average planned downtime for all the event types"""
@@ -446,8 +450,9 @@ class Probitan(WinView):
         plot = MYGRAPH()
         title = "Average Unplanned Downtime Per Month"
         self.close_plot()
-        fig, self.current_plot = plot.generate_average_monthly_dt_graph(self.processed_data, self.unplanned_events, title)
-        self.display_graph(fig, compare_command=lambda: self.compare_before_and_after_graphs('unplanned_events'))
+        fig, self.current_plot, legend_obj = plot.generate_average_monthly_dt_graph(self.processed_data, self.unplanned_events, title)
+        self.display_graph(fig, compare_command=lambda: self.compare_before_and_after_graphs('unplanned_events'),
+                           legend_obj=legend_obj)
 
     def plot_monthly_pr_graph(self, project):
         """Plots monthly pr graph"""
@@ -1058,9 +1063,19 @@ class Probitan(WinView):
             y2 = [round(y / 1000, 2) for y in plot.calculate_volume_per_month(processed_data_after, 5.525)]
             x1 = [x['month'] for x in processed_data_before]
             x2 = [x['month'] for x in processed_data_after]
+
+            # ensure the two lists have the same number of elements
+            # assign the volumes to their respective months in a dict
+            data1 = func.convert_lists_to_dict(self.project_class_before.months_covered, y1)
+            data2 = func.convert_lists_to_dict(self.project_class_after.months_covered, y2)
+
+            # use the dict to normalize the data
+            y1, y2 = func.normalize_dictionaries(data1, data2)
+            x1, x2 = func.normalize_lists(x1, x2)
+
             x_label = 'Months of the Year'
             y_label = 'Volume in Kg (x 1000)'
-            self.current_plot = None
+            self.close_plot()
             fig, self.current_plot = plot.compare_graphs(y1, x1, y2, x2, title=title, x_label=x_label,
                                                          y_label=y_label)
             self.display_graph(fig)
@@ -1070,6 +1085,16 @@ class Probitan(WinView):
             y2 = plot.calculate_PR(processed_data_after)
             x1 = [x['month'] for x in processed_data_before]
             x2 = [x['month'] for x in processed_data_after]
+
+            # ensure the two lists have the same number of elements
+            # assign the volumes to their respective months in a dict
+            data1 = func.convert_lists_to_dict(self.project_class_before.months_covered, y1)
+            data2 = func.convert_lists_to_dict(self.project_class_after.months_covered, y2)
+
+            # use the dict to normalize the data
+            y1, y2 = func.normalize_dictionaries(data1, data2)
+            x1, x2 = func.normalize_lists(x1, x2)
+
             x_label = 'Months of the Year'
             y_label = 'PR in %'
             self.close_plot()
@@ -1091,6 +1116,16 @@ class Probitan(WinView):
             y2 = [info2[func.enslave_strings(i)] for i in unplanned_events_after]
             x1 = [str(x) for x in list(range(1, 201))[:len(unplanned_events_before)]]
             x2 = [str(x) for x in list(range(1, 201))[:len(unplanned_events_after)]]
+
+            # ensure the two lists have the same number of elements
+            # assign the volumes to their respective months in a dict
+            data1 = func.convert_lists_to_dict([func.enslave_strings(i) for i in unplanned_events_before], y1)
+            data2 = func.convert_lists_to_dict([func.enslave_strings(i) for i in unplanned_events_after], y2)
+
+            # use the dict to normalize the data
+            y1, y2 = func.normalize_dictionaries(data1, data2)
+            x1, x2 = func.normalize_lists(x1, x2)
+
             x_label = 'Event Numbers - See legend for interpretation'
             y_label = 'DownTimes in mins'
             legends = plot.combine_lists(x1, unplanned_events_before, x_name)
@@ -1113,6 +1148,16 @@ class Probitan(WinView):
             y2 = [info2[func.enslave_strings(i)] for i in planned_events_after]
             x1 = [str(x) for x in list(range(1, 201))[:len(planned_events_before)]]
             x2 = [str(x) for x in list(range(1, 201))[:len(planned_events_after)]]
+
+            # ensure the two lists have the same number of elements
+            # assign the volumes to their respective months in a dict
+            data1 = func.convert_lists_to_dict([func.enslave_strings(i) for i in planned_events_before], y1)
+            data2 = func.convert_lists_to_dict([func.enslave_strings(i) for i in planned_events_after], y2)
+
+            # use the dict to normalize the data
+            y1, y2 = func.normalize_dictionaries(data1, data2)
+            x1, x2 = func.normalize_lists(x1, x2)
+
             x_label = 'Event Numbers - See legend for interpretation'
             y_label = 'DownTimes in mins'
             legends = plot.combine_lists(x1, planned_events_before, x_name)

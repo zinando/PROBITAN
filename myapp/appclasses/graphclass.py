@@ -1,14 +1,21 @@
 """This is the graph class module"""
+import pylab as p
 from myapp.helpers import myfunc as func
 import random
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import string
 import matplotlib.pyplot as plt
 import numpy as np
+import ctypes
 
 
 class MYGRAPH(object):
     """Class used to generate different graph for the machine/equipment data"""
+    dpi = 100  # the system's dpi is 96
+    default_screen_width = 1368
+    default_screen_height = 912
+    width_in_mm = 260
+    height_in_mm = 173
 
     def __init__(self):
         """Initialize the MYGRAPH class. No argument required"""
@@ -165,10 +172,13 @@ class MYGRAPH(object):
         # Generate sample data
         info = self.compute_average_time(data, event_types)
         uptime = [info[func.enslave_strings(i)] for i in event_types]
-        # uptime = np.random.randint(50, 300, len(event_types))
+
+        # calculate the graph dimensions
+        fig_size = self.get_figsize()
+        dpi = self.get_dpi()
 
         # Create the graph
-        fig, ax = plt.subplots(figsize=(18, 8))
+        fig, ax = plt.subplots(figsize=fig_size, dpi=dpi)
         bars = ax.bar(bottom_labels, uptime, bar_width, color=color)
         ax.set_xlabel("DownTime Events")
         ax.set_ylabel("Time in mins")
@@ -176,13 +186,13 @@ class MYGRAPH(object):
 
         # Create legend for event types
         legends = self.combine_lists(bottom_labels, event_types, uptime)
-        ax.legend(bars, legends)
+        legend_obj = ax.legend(bars, legends)
 
         # Configure the graph's appearance
         ax.set_facecolor('white')  # Set white background
         fig.set_facecolor('white')
 
-        return fig, plt
+        return fig, plt, legend_obj
 
     def generate_monthly_pr_graph(self, processed_data, title=""):
         """generates monthly pr graph"""
@@ -194,8 +204,12 @@ class MYGRAPH(object):
         # Generate sample data
         uptime = self.calculate_PR(processed_data)
 
+        # calculate the graph dimensions
+        fig_size = self.get_figsize()
+        dpi = self.get_dpi()
+
         # Create the graph
-        fig, ax = plt.subplots(figsize=(18, 8))
+        fig, ax = plt.subplots(figsize=fig_size, dpi=dpi)
         bars = ax.bar(months, uptime, bar_width, color=random.choice(color))
         ax.set_xlabel("Months of the Year")
         ax.set_ylabel("Process Reliability in %")
@@ -223,13 +237,20 @@ class MYGRAPH(object):
 
         # Generate sample data
         uptime = self.calculate_volume_per_month(processed_data, vpm)
+
+        # convert kg to metric tons or tonnes (same thing)
         uptime = [round(y / 1000, 2) for y in uptime]
 
+        # calculate the graph dimensions
+        fig_size = self.get_figsize()
+        dpi = self.get_dpi()
+
         # Create the graph
-        fig, ax = plt.subplots(figsize=(18, 8))
+        fig, ax = plt.subplots(figsize=fig_size, dpi=dpi)
+
         bars = ax.bar(months, uptime, bar_width, color=random.choice(color))
         ax.set_xlabel("Months of the Year")
-        ax.set_ylabel("Volume in Kg (x 1000)")
+        ax.set_ylabel("Volume in tonnes (metric tons)")
         ax.set_title(title)
 
         # Configure the graph's appearance
@@ -238,7 +259,7 @@ class MYGRAPH(object):
 
         # Annotate each bar with its volume
         for bar, vol in zip(bars, uptime):
-            ax.annotate(f'{vol:.2f} kg', xy=(bar.get_x() + bar.get_width() / 2, bar.get_height()),
+            ax.annotate(f'{vol:.2f} t', xy=(bar.get_x() + bar.get_width() / 2, bar.get_height()),
                         xytext=(0, 3), textcoords='offset points',
                         ha='center', va='bottom')
 
@@ -254,7 +275,11 @@ class MYGRAPH(object):
         bar_width = 0.4
         index = np.arange(len(x_data))
 
-        fig, ax = plt.subplots(figsize=(18, 8))
+        # calculate the graph dimensions
+        fig_size = self.get_figsize()
+        dpi = self.get_dpi()
+
+        fig, ax = plt.subplots(figsize=fig_size, dpi=dpi)
 
         bar1 = ax.bar(index - bar_width / 2, y_data1, bar_width, label='Before', color='skyblue')
         bar2 = ax.bar(index + bar_width / 2, y_data2, bar_width, label='After', color='salmon')
@@ -271,10 +296,10 @@ class MYGRAPH(object):
 
         # Adding annotations above each bar
         for i, v in enumerate(y_data1):
-            ax.text(i - bar_width / 2, v + 10, str(v), color='black', ha='center')
+            ax.text(i - bar_width / 2, v, str(v), color='black', ha='center', va='bottom')
 
         for i, v in enumerate(y_data2):
-            ax.text(i + bar_width / 2, v + 10, str(v), color='black', ha='center')
+            ax.text(i + bar_width / 2, v, str(v), color='black', ha='center', va='bottom')
 
         return fig, plt
 
@@ -289,8 +314,12 @@ class MYGRAPH(object):
         # Generate sample data
         uptime = y_data
 
+        # calculate the graph dimensions
+        fig_size = self.get_figsize()
+        dpi = self.get_dpi()
+
         # Create the graph
-        fig, ax = plt.subplots(figsize=(18, 8))
+        fig, ax = plt.subplots(figsize=fig_size, dpi=dpi)
         bars = ax.bar(months, uptime, bar_width, color=color)
         ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)
@@ -418,4 +447,28 @@ class MYGRAPH(object):
 
         return volume_list
 
+    import matplotlib.pyplot as plt
+
+    def get_figsize(self):
+        """uses the system's physical screen size to calculate graph figure size"""
+        # get the size of the current system screen
+        hdc = ctypes.windll.user32.GetDC(0)
+        win_width = int(ctypes.windll.gdi32.GetDeviceCaps(hdc, 4))
+        win_height = int(ctypes.windll.gdi32.GetDeviceCaps(hdc, 6))
+        system_resolution = win_width * win_height
+        default_resolution = self.width_in_mm * self.height_in_mm
+        figsize = (int((default_resolution / system_resolution) * 18), int((default_resolution / system_resolution) * 8))
+        return figsize
+
+    def get_dpi(self):
+        """uses the system's physical screen size to calculate the dpi to use"""
+        # get the size of the current system screen
+        hdc = ctypes.windll.user32.GetDC(0)
+        win_width = int(ctypes.windll.gdi32.GetDeviceCaps(hdc, 4))
+        win_height = int(ctypes.windll.gdi32.GetDeviceCaps(hdc, 6))
+        system_resolution = win_width * win_height
+        default_resolution = self.width_in_mm * self.height_in_mm
+        dpi = (default_resolution/system_resolution) * self.dpi
+
+        return dpi
 

@@ -1,0 +1,13 @@
+# Logs
+
+*.sln
+*.sw?
+#*.env
+#*.flaskenv
+virtual/
+virtuale/
+exec/
+build/
+Output/
+packaging scripts/
+cmd_configuration

@@ -13,7 +13,7 @@ class PROJECT:
     project_name = None
 
     def __init__(self, name, file, processed_data, event_types, planned_events, unplanned_events,
-				 cil_locations, date_format, location_processed_data, monthly_events):
+				 cil_locations, date_format, location_processed_data, monthly_events, month_list):
         """This initializes the class instance with attributes necessary to process the file"""
         self.name = name
         self.file = file
@@ -25,3 +25,4 @@ class PROJECT:
         self.monthly_events = monthly_events
         self.planned_events = planned_events
         self.unplanned_events = unplanned_events
+        self.months_covered = month_list

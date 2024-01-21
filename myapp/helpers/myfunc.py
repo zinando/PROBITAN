@@ -63,7 +63,7 @@ def select_file(path, folder_id):
     filename = tk.filedialog.askopenfilename(initialdir=path, filetypes=f_types)
     fh = FILEHANDLER(folder_id)
     result = fh.use_saved_file(filename)
-    return result
+    return result  # tuple
 
 
 def create_image_obj(imagepath, size):
@@ -222,3 +222,89 @@ def reduce_key_and_add_to_total_uptime(data_list, key, percentage):
                 month_data['total_downtime'] -= reduced_value
 
     return data_list
+
+
+def normalize_lists(list1, list2):
+    """
+    Compare two lists and fill the deficient list based on the content type.
+    If the content is numeric, fill with zeros for the missing elements.
+    If the content is string, fill with missing elements from the other list.
+
+    Args:
+    - list1: First list to compare.
+    - list2: Second list to compare.
+
+    Returns:
+    - Tuple containing the two filled lists.
+    """
+    if all(isinstance(item, (int, float)) for item in list1) and all(isinstance(item, (int, float)) for item in list2):
+        # Both lists contain numbers
+        max_len = max(len(list1), len(list2))
+        filled_list1 = list1 + [0] * (max_len - len(list1))
+        filled_list2 = list2 + [0] * (max_len - len(list2))
+        list1 = filled_list1
+        list2 = filled_list2
+    elif all(isinstance(item, str) for item in list1) and all(isinstance(item, str) for item in list2):
+        # Both lists contain strings
+        max_len = max(len(list1), len(list2))
+        filled_list1 = list1 + list(set(list2) - set(list1))[:max_len - len(list1)]
+        filled_list2 = list2 + list(set(list1) - set(list2))[:max_len - len(list2)]
+        list1 = filled_list1
+        list2 = filled_list2
+    else:
+        # Lists have different content types
+        error = 'Both lists must have the same content type.'
+        display_msg(error)
+    return list1, list2
+
+
+def convert_lists_to_dict(keys, values):
+    # Check if the lengths of both lists are equal
+    if len(keys) != len(values):
+        display_msg('cannot convert lists to dictionary')
+
+    result_dict = {}
+
+    # Iterate through the lists and construct the dictionary
+    for i in range(len(keys)):
+        result_dict[keys[i]] = values[i]
+
+    return result_dict
+
+
+def normalize_dictionaries(dict1, dict2):
+    # Check if the dictionaries have the same keys
+    if not (all(element in list(dict1.keys()) for element in list(dict2.keys())) or
+            all(element in list(dict2.keys()) for element in list(dict1.keys()))):
+        display_msg("Dictionaries must have the same keys")
+
+    # Determine the dictionary with the highest number of keys
+    if len(dict1) >= len(dict2):
+        larger_dict = dict1
+        smaller_dict = dict2
+    else:
+        larger_dict = dict2
+        smaller_dict = dict1
+
+    # Use the keys from the dictionary with the highest number of keys
+    keys_to_use = larger_dict.keys()
+
+    # Retrieve values from each dictionary or return zero if the key is not present
+    values_dict1 = [dict1.get(key, 0) for key in keys_to_use]
+    values_dict2 = [dict2.get(key, 0) for key in keys_to_use]
+
+    return values_dict1, values_dict2
+
+
+def get_screen_resolution():
+    # Create a hidden Tkinter window to access screen information
+    root = tk.Tk()
+    root.attributes('-alpha', 0)  # Hide the window
+
+    # Get the screen width and height in pixels
+    screen_width = int(root.winfo_screenwidth())
+    screen_height = int(root.winfo_screenheight())
+
+    root.destroy()
+
+    return screen_width, screen_height
