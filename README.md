@@ -2,7 +2,9 @@
 ![App Logo](./myapp/appfiles/images/bg/bg.jpg)
 ## Description ##
 
-**PROBITAN** is a software programme that is used to visualize equipment downtime events graphically. It accesses statistical records of downtime events for the equipment over a period of time and uses this data to present a picture of how each event contributes to the overall loses (PR loss) on the equipment over the period studied. 
+**PROBITAN** is a software programme that is used to visualize equipment downtime events graphically. It accesses
+statistical records of downtime events for the equipment over a period of time and uses this data to present a picture
+of how each event contributes to the overall losses (PR loss) on the equipment over the period studied. 
 
 ## How **PROBITAN** works
 * It accepts a project file as an input to be studied. This could be an existing file within the applications directories or a new file input
