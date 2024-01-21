@@ -103,7 +103,7 @@ of the impact of autonomous maintenance methodologies.
 The software requires windows operating system version 8 or higher.
 
 ### 3.2 Installation<a name="installation"></a>
-Download the installation file [here](installer/).
+Download the installation file [here](installler/).
 <p style="text-align: justify;">Double click on the file and allow it to install. By default, the installatiion destination is your Program Files 
 directory, but you could preferably change this to Users/your-user-name/AppData/Roaming.
 After installation, a shortcut desktop link of the app will appear on your device desktop.
