@@ -30,7 +30,7 @@ class WinView(ctk.CTk):
         self.w, self.h = w, h
         position_x = (self.winfo_screenwidth() // 2) - (w // 2)
         position_y = (self.winfo_screenheight() // 2) - (h // 2)
-        self.geometry("{}x{}+{}+{}".format(w, h, position_x * 2, position_y))
+        self.geometry("{}x{}+{}+{}".format(w, h, position_x, position_y))
         self.title('PROBITAN - An Equipment Process Reliability Analytical Tool.')
         self.iconbitmap('myapp/appfiles/images/bg/icon.ico')
         func.make_dynamic(self)

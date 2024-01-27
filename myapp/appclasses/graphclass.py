@@ -169,20 +169,24 @@ class MYGRAPH(object):
         color = self.get_bar_colors(len(event_types))
         # create numbers to represent each event at the graph bottom
         bottom_labels = [str(x) for x in list(range(1, 201))[:len(event_types)]]
+
         # Generate sample data
         info = self.compute_average_time(data, event_types)
         uptime = [info[func.enslave_strings(i)] for i in event_types]
 
         # calculate the graph dimensions
-        fig_size = self.get_figsize()
-        dpi = self.get_dpi()
+        # fig_size = self.get_figsize()
+        # dpi = self.get_dpi()
 
         # Create the graph
-        fig, ax = plt.subplots(figsize=fig_size, dpi=dpi)
+        # fig, ax = plt.subplots(figsize=fig_size, dpi=dpi)
+        fig, ax = plt.subplots()
+        fig.set_size_inches(18, 8)
         bars = ax.bar(bottom_labels, uptime, bar_width, color=color)
         ax.set_xlabel("DownTime Events")
         ax.set_ylabel("Time in mins")
         ax.set_title(title)
+        fig.subplots_adjust(left=0.05, right=0.95, bottom=0.1, top=0.95, wspace=0, hspace=0)
 
         # Create legend for event types
         legends = self.combine_lists(bottom_labels, event_types, uptime)
