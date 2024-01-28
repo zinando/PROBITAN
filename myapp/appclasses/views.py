@@ -305,7 +305,6 @@ class WinView(ctk.CTk):
                 self.display_graph(fig, compare_command, expand_command, legend_obj)
             return
 
-
         # create the label to hold the graph
         x = 0
         y = 0
@@ -347,11 +346,15 @@ class WinView(ctk.CTk):
                                       command=exit_command)
 
         # Convert Matplotlib figure to Tkinter-compatible format
-        canvas = FigureCanvasTkAgg(fig, master=bg_lab)  # Replace 'tk.Tk()' with your existing Tkinter window
+        canvas = FigureCanvasTkAgg(fig, master=bg_lab)
 
         canvas.draw()
-        canvas.get_tk_widget().place(x=0, y=0)
-
+        canvas_widget = canvas.get_tk_widget()
+        self.update()
+        w = bg_lab.winfo_width()
+        h = bg_lab.winfo_height()
+        canvas_widget.config(width=w, height=h)
+        canvas_widget.place(x=0, y=0)
 
     def show_current_plot(self):
         """shows the current plot outside the app"""

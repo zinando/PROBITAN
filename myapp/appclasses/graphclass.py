@@ -174,19 +174,13 @@ class MYGRAPH(object):
         info = self.compute_average_time(data, event_types)
         uptime = [info[func.enslave_strings(i)] for i in event_types]
 
-        # calculate the graph dimensions
-        # fig_size = self.get_figsize()
-        # dpi = self.get_dpi()
-
         # Create the graph
-        # fig, ax = plt.subplots(figsize=fig_size, dpi=dpi)
         fig, ax = plt.subplots()
-        fig.set_size_inches(18, 8)
+        fig.set_size_inches(8.5, 3.5)
         bars = ax.bar(bottom_labels, uptime, bar_width, color=color)
         ax.set_xlabel("DownTime Events")
         ax.set_ylabel("Time in mins")
         ax.set_title(title)
-        fig.subplots_adjust(left=0.05, right=0.95, bottom=0.1, top=0.95, wspace=0, hspace=0)
 
         # Create legend for event types
         legends = self.combine_lists(bottom_labels, event_types, uptime)
@@ -208,12 +202,9 @@ class MYGRAPH(object):
         # Generate sample data
         uptime = self.calculate_PR(processed_data)
 
-        # calculate the graph dimensions
-        fig_size = self.get_figsize()
-        dpi = self.get_dpi()
-
         # Create the graph
-        fig, ax = plt.subplots(figsize=fig_size, dpi=dpi)
+        fig, ax = plt.subplots()
+        fig.set_size_inches(8.5, 3.5)
         bars = ax.bar(months, uptime, bar_width, color=random.choice(color))
         ax.set_xlabel("Months of the Year")
         ax.set_ylabel("Process Reliability in %")
@@ -245,12 +236,9 @@ class MYGRAPH(object):
         # convert kg to metric tons or tonnes (same thing)
         uptime = [round(y / 1000, 2) for y in uptime]
 
-        # calculate the graph dimensions
-        fig_size = self.get_figsize()
-        dpi = self.get_dpi()
-
         # Create the graph
-        fig, ax = plt.subplots(figsize=fig_size, dpi=dpi)
+        fig, ax = plt.subplots()
+        fig.set_size_inches(8.5, 3.5)
 
         bars = ax.bar(months, uptime, bar_width, color=random.choice(color))
         ax.set_xlabel("Months of the Year")
@@ -279,11 +267,8 @@ class MYGRAPH(object):
         bar_width = 0.4
         index = np.arange(len(x_data))
 
-        # calculate the graph dimensions
-        fig_size = self.get_figsize()
-        dpi = self.get_dpi()
-
-        fig, ax = plt.subplots(figsize=fig_size, dpi=dpi)
+        fig, ax = plt.subplots()
+        fig.set_size_inches(8.5, 3.5)
 
         bar1 = ax.bar(index - bar_width / 2, y_data1, bar_width, label='Before', color='skyblue')
         bar2 = ax.bar(index + bar_width / 2, y_data2, bar_width, label='After', color='salmon')
@@ -318,12 +303,9 @@ class MYGRAPH(object):
         # Generate sample data
         uptime = y_data
 
-        # calculate the graph dimensions
-        fig_size = self.get_figsize()
-        dpi = self.get_dpi()
-
         # Create the graph
-        fig, ax = plt.subplots(figsize=fig_size, dpi=dpi)
+        fig, ax = plt.subplots()
+        fig.set_size_inches(8.5, 3.5)
         bars = ax.bar(months, uptime, bar_width, color=color)
         ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)
