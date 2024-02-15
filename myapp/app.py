@@ -1297,6 +1297,7 @@ class Probitan(WinView):
         """closes plot assigned to current_plot"""
         if self.current_plot is not None:
             self.current_plot.close()
+            self.current_plot = None
 
         return
 
