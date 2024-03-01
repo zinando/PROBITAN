@@ -185,8 +185,13 @@ to optimize processes, reduce downtime, and enhance overall factory productivity
 ## 9. License<a name="license"></a>
 
 ## Authors ##
+👤 **Engr. Adetoro, Femi Ezekiel**
+
+- Email: [adetorofemi@gmail.com](mailto:adetorofemi@gmail.com)
+
 👤 **Ndubumma Samuel Nnadozie**
 
 - GitHub: [@zinando](https://github.com/zinando)
 - Twitter: [@i_am_Zinando](https://twitter.com/i_am_Zinando)
 - LinkedIn: [LinkedIn](https://www.linkedin.com/in/samuel-nnadozie-38349476)
+- Email: [xienando4reaconcepts@gmail.com](mailto:xienando4reaconcepts@gmail.com)
